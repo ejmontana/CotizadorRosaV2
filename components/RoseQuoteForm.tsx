@@ -11,21 +11,30 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 const MAX_MATERIALES = 10;
 const MAX_GASTOS_FIJOS = 10;
 
+const formatCurrency = (value: number) => {
+  return new Intl.NumberFormat('es-AR', {
+    style: 'currency',
+    currency: 'ARS',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }).format(value).replace('ARS', '').trim();
+};
+
 export default function RoseQuoteForm() {
   const [formData, setFormData] = useState({
     manualidad: '',
     fecha: '',
-    horasTrabajadas: 0,
+    horasTrabajadas: '0',
     materiales: [
-      { nombre: 'cinta', precio: 3.50 },
-      { nombre: 'silicon', precio: 1.00 },
-      { nombre: 'palitos de altura', precio: 0.50 }
+      { nombre: 'cinta', precio: '3.50' },
+      { nombre: 'silicon', precio: '1.00' },
+      { nombre: 'palitos de altura', precio: '0.50' }
     ],
-    manoDeObra: 1000,
+    manoDeObra: '1000',
     gastosFijos: [
-      { nombre: 'luz', valor: 20 },
-      { nombre: 'celular', valor: 20 },
-      { nombre: 'alquiler', valor: 200 }
+      { nombre: 'luz', valor: '20' },
+      { nombre: 'celular', valor: '20' },
+      { nombre: 'alquiler', valor: '200' }
     ],
   });
 
@@ -40,7 +49,7 @@ export default function RoseQuoteForm() {
   });
   const [materialesWarning, setMaterialesWarning] = useState('');
   const [gastosFijosWarning, setGastosFijosWarning] = useState('');
-  const [utilidadPorcentaje, setUtilidadPorcentaje] = useState(40);
+  const [utilidadPorcentaje, setUtilidadPorcentaje] = useState('40');
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -64,14 +73,16 @@ export default function RoseQuoteForm() {
       setMaterialesWarning('No se pueden agregar más materiales.');
       return;
     }
-    const lastMaterial = formData.materiales[formData.materiales.length - 1];
-    if (!lastMaterial.nombre || !lastMaterial.precio) {
-      setMaterialesWarning('Por favor, complete el material anterior antes de agregar uno nuevo.');
-      return;
+    if (formData.materiales.length > 0) {
+      const lastMaterial = formData.materiales[formData.materiales.length - 1];
+      if (!lastMaterial.nombre || !lastMaterial.precio) {
+        setMaterialesWarning('Por favor, complete el material anterior antes de agregar uno nuevo.');
+        return;
+      }
     }
     setFormData(prevData => ({
       ...prevData,
-      materiales: [...prevData.materiales, { nombre: '', precio: 0 }]
+      materiales: [...prevData.materiales, { nombre: '', precio: '' }]
     }));
     setMaterialesWarning('');
   };
@@ -98,14 +109,16 @@ export default function RoseQuoteForm() {
       setGastosFijosWarning('No se pueden agregar más gastos fijos.');
       return;
     }
-    const lastGastoFijo = formData.gastosFijos[formData.gastosFijos.length - 1];
-    if (!lastGastoFijo.nombre || !lastGastoFijo.valor) {
-      setGastosFijosWarning('Por favor, complete el gasto fijo anterior antes de agregar uno nuevo.');
-      return;
+    if (formData.gastosFijos.length > 0) {
+      const lastGastoFijo = formData.gastosFijos[formData.gastosFijos.length - 1];
+      if (!lastGastoFijo.nombre || !lastGastoFijo.valor) {
+        setGastosFijosWarning('Por favor, complete el gasto fijo anterior antes de agregar uno nuevo.');
+        return;
+      }
     }
     setFormData(prevData => ({
       ...prevData,
-      gastosFijos: [...prevData.gastosFijos, { nombre: '', valor: 0 }]
+      gastosFijos: [...prevData.gastosFijos, { nombre: '', valor: '' }]
     }));
     setGastosFijosWarning('');
   };
@@ -119,13 +132,13 @@ export default function RoseQuoteForm() {
   };
 
   const calculateTotal = () => {
-    const materiaPrima = formData.materiales.reduce((acc, mat) => acc + parseFloat(mat.precio), 0);
-    const manoDeObra = parseFloat(formData.manoDeObra);
-    const gastosFijos = formData.gastosFijos.reduce((acc, gasto) => acc + parseFloat(gasto.valor), 0);
-    const sueldosAdministrativos = 0; // Asumimos que no hay sueldos administrativos por ahora
+    const materiaPrima = formData.materiales.reduce((acc, mat) => acc + parseFloat(mat.precio || '0'), 0);
+    const manoDeObra = parseFloat(formData.manoDeObra || '0');
+    const gastosFijos = formData.gastosFijos.reduce((acc, gasto) => acc + parseFloat(gasto.valor || '0'), 0);
+    const sueldosAdministrativos = 0;
     
     const totalSinUtilidad = materiaPrima + manoDeObra + gastosFijos + sueldosAdministrativos;
-    const utilidad = totalSinUtilidad * (utilidadPorcentaje / 100);
+    const utilidad = totalSinUtilidad * (parseFloat(utilidadPorcentaje) / 100);
     const total = totalSinUtilidad + utilidad;
 
     setTotalCost({
@@ -172,6 +185,8 @@ export default function RoseQuoteForm() {
                 id="horasTrabajadas"
                 name="horasTrabajadas"
                 type="number"
+                min="0"
+                step="0.5"
                 value={formData.horasTrabajadas}
                 onChange={handleInputChange}
               />
@@ -182,34 +197,45 @@ export default function RoseQuoteForm() {
                 id="utilidad"
                 name="utilidad"
                 type="number"
+                min="0"
+                max="100"
                 value={utilidadPorcentaje}
-                onChange={(e) => setUtilidadPorcentaje(parseFloat(e.target.value))}
+                onChange={(e) => setUtilidadPorcentaje(e.target.value)}
               />
             </div>
           </div>
 
           <div>
             <Label>Materiales</Label>
+            <div className="grid grid-cols-4 gap-2 mb-2">
+              <div className="col-span-3">Nombre</div>
+              <div>Precio</div>
+            </div>
             {formData.materiales.map((material, index) => (
-              <div key={index} className="flex items-center space-x-2 mt-2">
+              <div key={index} className="grid grid-cols-4 gap-2 items-center mt-2">
                 <Input
+                  className="col-span-3"
                   placeholder="Nombre"
                   value={material.nombre}
                   onChange={(e) => handleMaterialChange(index, 'nombre', e.target.value)}
                 />
-                <Input
-                  placeholder="Precio"
-                  type="number"
-                  value={material.precio}
-                  onChange={(e) => handleMaterialChange(index, 'precio', e.target.value)}
-                />
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => removeMaterial(index)}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
+                <div className="flex items-center space-x-2">
+                  <Input
+                    className="w-full"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={material.precio}
+                    onChange={(e) => handleMaterialChange(index, 'precio', e.target.value)}
+                  />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => removeMaterial(index)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             ))}
             <Button
@@ -235,6 +261,8 @@ export default function RoseQuoteForm() {
               id="manoDeObra"
               name="manoDeObra"
               type="number"
+              min="0"
+              step="0.01"
               value={formData.manoDeObra}
               onChange={handleInputChange}
             />
@@ -242,26 +270,35 @@ export default function RoseQuoteForm() {
 
           <div>
             <Label>Gastos Fijos</Label>
+            <div className="grid grid-cols-4 gap-2 mb-2">
+              <div className="col-span-3">Nombre</div>
+              <div>Valor</div>
+            </div>
             {formData.gastosFijos.map((gasto, index) => (
-              <div key={index} className="flex items-center space-x-2 mt-2">
+              <div key={index} className="grid grid-cols-4 gap-2 items-center mt-2">
                 <Input
+                  className="col-span-3"
                   placeholder="Nombre"
                   value={gasto.nombre}
                   onChange={(e) => handleGastoFijoChange(index, 'nombre', e.target.value)}
                 />
-                <Input
-                  placeholder="Valor"
-                  type="number"
-                  value={gasto.valor}
-                  onChange={(e) => handleGastoFijoChange(index, 'valor', e.target.value)}
-                />
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => removeGastoFijo(index)}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
+                <div className="flex items-center space-x-2">
+                  <Input
+                    className="w-full"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={gasto.valor}
+                    onChange={(e) => handleGastoFijoChange(index, 'valor', e.target.value)}
+                  />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => removeGastoFijo(index)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             ))}
             <Button
@@ -289,20 +326,26 @@ export default function RoseQuoteForm() {
             <div className="mt-6 border-t pt-4">
               <h3 className="text-lg font-semibold mb-3">COSTO TOTAL POR PIEZA</h3>
               <div className="grid grid-cols-2 gap-2">
-                <div>MATERIA PRIMA</div>
-                <div className="text-right">${totalCost.materiaPrima.toFixed(2)}</div>
+                <div className="flex flex-col">
+                  <span>MATERIA PRIMA</span>
+                  <span className="text-xs text-gray-500">({formData.materiales.length} items)</span>
+                </div>
+                <div className="text-right">{formatCurrency(totalCost.materiaPrima)}</div>
                 <div>MANO DE OBRA</div>
-                <div className="text-right">${totalCost.manoDeObra.toFixed(2)}</div>
-                <div>GASTOS FIJOS</div>
-                <div className="text-right">${totalCost.gastosFijos.toFixed(2)}</div>
+                <div className="text-right">{formatCurrency(totalCost.manoDeObra)}</div>
+                <div className="flex flex-col">
+                  <span>GASTOS FIJOS</span>
+                  <span className="text-xs text-gray-500">({formData.gastosFijos.length} items)</span>
+                </div>
+                <div className="text-right">{formatCurrency(totalCost.gastosFijos)}</div>
                 <div>SUELDOS ADMINISTRATIVOS</div>
-                <div className="text-right">${totalCost.sueldosAdministrativos.toFixed(2)}</div>
+                <div className="text-right">{formatCurrency(totalCost.sueldosAdministrativos)}</div>
                 <div className="font-semibold">TOTAL SIN UTILIDAD</div>
-                <div className="text-right font-semibold">${totalCost.totalSinUtilidad.toFixed(2)}</div>
-                <div className="font-semibold">UTILIDAD</div>
-                <div className="text-right font-semibold">${totalCost.utilidad.toFixed(2)}</div>
+                <div className="text-right font-semibold">{formatCurrency(totalCost.totalSinUtilidad)}</div>
+                <div className="font-semibold">UTILIDAD ({utilidadPorcentaje}%)</div>
+                <div className="text-right font-semibold">{formatCurrency(totalCost.utilidad)}</div>
                 <div className="font-bold text-lg">TOTAL:</div>
-                <div className="text-right font-bold text-lg">${totalCost.total.toFixed(2)}</div>
+                <div className="text-right font-bold text-lg">{formatCurrency(totalCost.total)}</div>
               </div>
             </div>
           )}
