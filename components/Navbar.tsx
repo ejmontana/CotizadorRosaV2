@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button"
 import { Flower, Menu, X } from 'lucide-react';
 import { useAuthStore } from '@/lib/store';
+import { ThemeToggle } from './ThemeToggle';
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -19,30 +20,32 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-white shadow-sm">
+    <nav className="bg-background border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link href="/dashboard" className="flex-shrink-0 flex items-center">
-              <Flower className="h-8 w-8 text-pink-500" />
-              <span className="ml-2 text-xl font-semibold text-gray-900">Cotizador Rosa</span>
+              <Flower className="h-8 w-8 text-primary" />
+              <span className="ml-2 text-xl font-semibold text-foreground">Cotizador Rosa</span>
             </Link>
           </div>
-          <div className="hidden sm:ml-6 sm:flex sm:items-center">
-            <span className="text-sm text-gray-500 mr-4">Hola, {user}</span>
+          <div className="hidden sm:ml-6 sm:flex sm:items-center space-x-4">
+            <span className="text-sm text-muted-foreground">Hola, {user}</span>
+            <ThemeToggle />
             <Button
               onClick={handleLogout}
               variant="ghost"
               size="sm"
-              className="text-gray-500 hover:text-gray-700"
+              className="text-muted-foreground hover:text-foreground"
             >
               Salir
             </Button>
           </div>
           <div className="flex items-center sm:hidden">
+            <ThemeToggle />
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-pink-500"
+              className="inline-flex items-center justify-center p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary ml-2"
             >
               {isMenuOpen ? (
                 <X className="block h-6 w-6" aria-hidden="true" />
@@ -59,13 +62,13 @@ export default function Navbar() {
           <div className="pt-2 pb-3 space-y-1">
             <Link
               href="/dashboard"
-              className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+              className="block px-3 py-2 rounded-md text-base font-medium text-foreground hover:text-foreground hover:bg-accent"
             >
               Dashboard
             </Link>
             <button
               onClick={handleLogout}
-              className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+              className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-foreground hover:text-foreground hover:bg-accent"
             >
               Salir
             </button>

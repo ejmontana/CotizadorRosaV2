@@ -5,20 +5,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
-import { PlusCircle, X, AlertCircle } from 'lucide-react';
+import { PlusCircle, X, AlertCircle, DollarSign, Calendar, Clock, Percent } from 'lucide-react';
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { formatCurrency } from '@/lib/utils';
 
 const MAX_MATERIALES = 10;
 const MAX_GASTOS_FIJOS = 10;
-
-const formatCurrency = (value: number) => {
-  return new Intl.NumberFormat('es-AR', {
-    style: 'currency',
-    currency: 'ARS',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  }).format(value).replace('ARS', '').trim();
-};
 
 export default function RoseQuoteForm() {
   const [formData, setFormData] = useState({
@@ -153,60 +145,76 @@ export default function RoseQuoteForm() {
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
-      <CardHeader>
-        <CardTitle>Cotizador de Arreglos</CardTitle>
+    <Card className="w-full max-w-2xl mx-auto bg-gradient-to-br from-pink-50 to-white dark:from-gray-900 dark:to-gray-800 shadow-xl">
+      <CardHeader className="bg-gradient-to-r from-pink-500 to-purple-600 text-white p-6 rounded-t-lg">
+        <CardTitle className="text-2xl font-bold flex items-center">
+          <DollarSign className="mr-2 h-6 w-6" />
+          Cotizador de Arreglos
+        </CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
+      <CardContent className="p-6">
+        <div className="space-y-6">
           <div>
-            <Label htmlFor="manualidad">Manualidad</Label>
+            <Label htmlFor="manualidad" className="text-lg font-medium text-gray-700 dark:text-gray-300">Manualidad</Label>
             <Input
               id="manualidad"
               name="manualidad"
               value={formData.manualidad}
               onChange={handleInputChange}
+              className="mt-1 bg-white dark:bg-gray-700"
             />
           </div>
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <Label htmlFor="fecha">Fecha</Label>
-              <Input
-                id="fecha"
-                name="fecha"
-                type="date"
-                value={formData.fecha}
-                onChange={handleInputChange}
-              />
+              <Label htmlFor="fecha" className="text-lg font-medium text-gray-700 dark:text-gray-300">Fecha</Label>
+              <div className="relative mt-1">
+                <Input
+                  id="fecha"
+                  name="fecha"
+                  type="date"
+                  value={formData.fecha}
+                  onChange={handleInputChange}
+                  className="pl-10 bg-white dark:bg-gray-700"
+                />
+                <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+              </div>
             </div>
             <div>
-              <Label htmlFor="horasTrabajadas">Horas trabajadas</Label>
-              <Input
-                id="horasTrabajadas"
-                name="horasTrabajadas"
-                type="number"
-                min="0"
-                step="0.5"
-                value={formData.horasTrabajadas}
-                onChange={handleInputChange}
-              />
+              <Label htmlFor="horasTrabajadas" className="text-lg font-medium text-gray-700 dark:text-gray-300">Horas trabajadas</Label>
+              <div className="relative mt-1">
+                <Input
+                  id="horasTrabajadas"
+                  name="horasTrabajadas"
+                  type="number"
+                  min="0"
+                  step="0.5"
+                  value={formData.horasTrabajadas}
+                  onChange={handleInputChange}
+                  className="pl-10 bg-white dark:bg-gray-700"
+                />
+                <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+              </div>
             </div>
             <div>
-              <Label htmlFor="utilidad">Utilidad (%)</Label>
-              <Input
-                id="utilidad"
-                name="utilidad"
-                type="number"
-                min="0"
-                max="100"
-                value={utilidadPorcentaje}
-                onChange={(e) => setUtilidadPorcentaje(e.target.value)}
-              />
+              <Label htmlFor="utilidad" className="text-lg font-medium text-gray-700 dark:text-gray-300">Utilidad (%)</Label>
+              <div className="relative mt-1">
+                <Input
+                  id="utilidad"
+                  name="utilidad"
+                  type="number"
+                  min="0"
+                  max="100"
+                  value={utilidadPorcentaje}
+                  onChange={(e) => setUtilidadPorcentaje(e.target.value)}
+                  className="pl-10 bg-white dark:bg-gray-700"
+                />
+                <Percent className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+              </div>
             </div>
           </div>
 
           <div>
-            <Label>Materiales</Label>
+            <Label className="text-lg font-medium text-gray-700 dark:text-gray-300">Materiales</Label>
             <div className="grid grid-cols-4 gap-2 mb-2">
               <div className="col-span-3">Nombre</div>
               <div>Precio</div>
@@ -214,14 +222,14 @@ export default function RoseQuoteForm() {
             {formData.materiales.map((material, index) => (
               <div key={index} className="grid grid-cols-4 gap-2 items-center mt-2">
                 <Input
-                  className="col-span-3"
+                  className="col-span-3 bg-white dark:bg-gray-700"
                   placeholder="Nombre"
                   value={material.nombre}
                   onChange={(e) => handleMaterialChange(index, 'nombre', e.target.value)}
                 />
                 <div className="flex items-center space-x-2">
                   <Input
-                    className="w-full"
+                    className="w-full bg-white dark:bg-gray-700"
                     type="number"
                     min="0"
                     step="0.01"
@@ -256,7 +264,7 @@ export default function RoseQuoteForm() {
           </div>
 
           <div>
-            <Label htmlFor="manoDeObra">Mano de obra</Label>
+            <Label htmlFor="manoDeObra" className="text-lg font-medium text-gray-700 dark:text-gray-300">Mano de obra</Label>
             <Input
               id="manoDeObra"
               name="manoDeObra"
@@ -265,11 +273,12 @@ export default function RoseQuoteForm() {
               step="0.01"
               value={formData.manoDeObra}
               onChange={handleInputChange}
+              className="mt-1 bg-white dark:bg-gray-700"
             />
           </div>
 
           <div>
-            <Label>Gastos Fijos</Label>
+            <Label className="text-lg font-medium text-gray-700 dark:text-gray-300">Gastos Fijos</Label>
             <div className="grid grid-cols-4 gap-2 mb-2">
               <div className="col-span-3">Nombre</div>
               <div>Valor</div>
@@ -277,14 +286,14 @@ export default function RoseQuoteForm() {
             {formData.gastosFijos.map((gasto, index) => (
               <div key={index} className="grid grid-cols-4 gap-2 items-center mt-2">
                 <Input
-                  className="col-span-3"
+                  className="col-span-3 bg-white dark:bg-gray-700"
                   placeholder="Nombre"
                   value={gasto.nombre}
                   onChange={(e) => handleGastoFijoChange(index, 'nombre', e.target.value)}
                 />
                 <div className="flex items-center space-x-2">
                   <Input
-                    className="w-full"
+                    className="w-full bg-white dark:bg-gray-700"
                     type="number"
                     min="0"
                     step="0.01"
@@ -318,34 +327,35 @@ export default function RoseQuoteForm() {
             )}
           </div>
 
-          <Button className="w-full" onClick={calculateTotal}>
+          <Button className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white" onClick={calculateTotal}>
+            <DollarSign className="mr-2 h-5 w-5" />
             Calcular Total
           </Button>
 
           {totalCost.total > 0 && (
             <div className="mt-6 border-t pt-4">
-              <h3 className="text-lg font-semibold mb-3">COSTO TOTAL POR PIEZA</h3>
-              <div className="grid grid-cols-2 gap-2">
+              <h3 className="text-xl font-bold mb-3 text-pink-600 dark:text-pink-400">COSTO TOTAL POR PIEZA</h3>
+              <div className="grid grid-cols-2 gap-2 bg-gradient-to-br from-pink-50 to-purple-50 dark:from-gray-800 dark:to-gray-700 p-4 rounded-lg">
                 <div className="flex flex-col">
-                  <span>MATERIA PRIMA</span>
-                  <span className="text-xs text-gray-500">({formData.materiales.length} items)</span>
+                  <span className="font-medium text-gray-700 dark:text-gray-300">MATERIA PRIMA</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">({formData.materiales.length} items)</span>
                 </div>
-                <div className="text-right">{formatCurrency(totalCost.materiaPrima)}</div>
-                <div>MANO DE OBRA</div>
-                <div className="text-right">{formatCurrency(totalCost.manoDeObra)}</div>
+                <div className="text-right font-medium text-gray-800 dark:text-gray-200">{formatCurrency(totalCost.materiaPrima)}</div>
+                <div className="font-medium text-gray-700 dark:text-gray-300">MANO DE OBRA</div>
+                <div className="text-right font-medium text-gray-800 dark:text-gray-200">{formatCurrency(totalCost.manoDeObra)}</div>
                 <div className="flex flex-col">
-                  <span>GASTOS FIJOS</span>
-                  <span className="text-xs text-gray-500">({formData.gastosFijos.length} items)</span>
+                  <span className="font-medium text-gray-700 dark:text-gray-300">GASTOS FIJOS</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">({formData.gastosFijos.length} items)</span>
                 </div>
-                <div className="text-right">{formatCurrency(totalCost.gastosFijos)}</div>
-                <div>SUELDOS ADMINISTRATIVOS</div>
-                <div className="text-right">{formatCurrency(totalCost.sueldosAdministrativos)}</div>
-                <div className="font-semibold">TOTAL SIN UTILIDAD</div>
-                <div className="text-right font-semibold">{formatCurrency(totalCost.totalSinUtilidad)}</div>
-                <div className="font-semibold">UTILIDAD ({utilidadPorcentaje}%)</div>
-                <div className="text-right font-semibold">{formatCurrency(totalCost.utilidad)}</div>
-                <div className="font-bold text-lg">TOTAL:</div>
-                <div className="text-right font-bold text-lg">{formatCurrency(totalCost.total)}</div>
+                <div className="text-right font-medium text-gray-800 dark:text-gray-200">{formatCurrency(totalCost.gastosFijos)}</div>
+                <div className="font-medium text-gray-700 dark:text-gray-300">SUELDOS ADMINISTRATIVOS</div>
+                <div className="text-right font-medium text-gray-800 dark:text-gray-200">{formatCurrency(totalCost.sueldosAdministrativos)}</div>
+                <div className="font-semibold text-lg text-gray-800 dark:text-gray-200">TOTAL SIN UTILIDAD</div>
+                <div className="text-right font-semibold text-lg text-gray-800 dark:text-gray-200">{formatCurrency(totalCost.totalSinUtilidad)}</div>
+                <div className="font-semibold text-lg text-gray-800 dark:text-gray-200">UTILIDAD ({utilidadPorcentaje}%)</div>
+                <div className="text-right font-semibold text-lg text-gray-800 dark:text-gray-200">{formatCurrency(totalCost.utilidad)}</div>
+                <div className="font-bold text-xl text-pink-600 dark:text-pink-400">TOTAL:</div>
+                <div className="text-right font-bold text-xl text-pink-600 dark:text-pink-400">{formatCurrency(totalCost.total)}</div>
               </div>
             </div>
           )}
